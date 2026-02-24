@@ -111,7 +111,7 @@ Routing rules:
 - Tool:
   - `product_search(search_query, limit)`:
     - Calls an **n8n webhook**:
-      - `https://client-aiprl-n8n.ltjed0.easypanel.host/webhook/309ebc89-2dd8-4c34-9bf4-Patty-Peck`
+      
     - Expects JSON with a `products` list containing:
       - `product_name`, `product_price`, `product_description`, `product_URL`, `product_image_URL`
     - Returns:
@@ -139,7 +139,6 @@ The agent is designed to be extended via **webhooks** (n8n or any backend):
 
 - **Product search** (already wired):
   - `product_search` → n8n webhook at  
-    `https://client-aiprl-n8n.ltjed0.easypanel.host/webhook/309ebc89-2dd8-4c34-9bf4-Patty-Peck`
 
 - **To implement later (recommended)**:
   - `send_sms` → n8n workflow that calls your SMS provider.
