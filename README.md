@@ -1,6 +1,6 @@
 ## Patty Peck Honda – ADK Multi-Agent Project
 
-This project contains a **Google ADK** multi-agent setup for **Patty Peck Honda**, plus some helper code used for another client (`multi_agent_builder.py` for Gavigans).
+This project contains a **Google ADK** multi-agent setup for **Patty Peck Honda**.
 
 The main production agent lives in the `multi_tool_agent` package and is designed to run under the ADK CLI (`adk run` / `adk web`).
 
@@ -11,7 +11,6 @@ The main production agent lives in the `multi_tool_agent` package and is designe
 ```text
 ADK/
 ├─ README.md                 # This file
-├─ multi_agent_builder.py    # Reference multi-agent implementation for Gavigans (not used at runtime here)
 ├─ multi_tool_agent/
 │  ├─ __init__.py            # Exports root_agent and sub-agents
 │  └─ agent.py               # All agent + tool definitions for Patty Peck Honda
@@ -25,23 +24,12 @@ ADK/
   - Defines four ADK agents:
     - `patty_peck_assistant` – root **orchestrator**, routes only (no direct answers).
     - `faq_agent` – business FAQ, hours, directions, warranty info, general questions.
-    - `product_agent` – vehicle/product search via n8n + Supabase vector store.
+    - `product_agent` – vehicle/product search via n8n.
     - `appointment_support_agent` – appointments and support / ticketing.
 - `__init__.py`
   - Re-exports:
     - `root_agent` (alias of `patty_peck_assistant`)
     - All three sub-agents for optional direct use.
-
-### Reference file: `multi_agent_builder.py`
-
-This file shows a complete multi-agent setup for **Gavigans** (another client) with:
-
-- Hard-coded `search_products`, `create_ticket`, and `create_appointment` tools.
-- A different agent tree and instructions.
-
-It is **not used by the Patty Peck Honda agent**, but serves as a pattern you can copy from when wiring tools or callbacks.
-
----
 
 ## Requirements
 
@@ -169,10 +157,8 @@ When you are ready to wire these, move the URLs and secrets into a `.env` file a
 - To modify behavior:
   - Update agent instructions in `multi_tool_agent/agent.py`.
   - Adjust tool implementations in the same file.
-- `multi_agent_builder.py` shows a **larger, more complex** multi-agent tree and tool patterns you can copy for Patty Peck if you decide to expand beyond 3 specialists.
 
 If you add new agents or tools, remember to:
 
 - Export them from `multi_tool_agent/__init__.py` if you want external access.
 - Keep the root orchestrator strictly routing-only so that specialists own all user-facing replies.
-
