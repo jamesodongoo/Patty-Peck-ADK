@@ -214,8 +214,6 @@ def create_ticket(
 ) -> dict:
     """Create a support ticket for a customer issue (Patty Peck Honda).
     
-    This mirrors the Gavigans ticketing tool from multi_agent_builder.py but uses
-    Patty Peck–specific endpoints and placeholder values you can replace later.
     
     Args:
         title: Short summary of the ticket.
@@ -283,8 +281,7 @@ def create_appointment(
 ) -> dict:
     """Create an appointment for a customer (Patty Peck Honda).
     
-    Mirrors the Gavigans calendar tool in multi_agent_builder.py with placeholder
-    calendar endpoint and headers that you can replace with Patty Peck values.
+    
     
     Args:
         title: Short title, for example "In-Store Consultation" or "Virtual Consultation".
@@ -293,7 +290,7 @@ def create_appointment(
         customerEmail: Email address of the customer.
         customerPhone: Phone number of the customer.
         duration: Duration in minutes, default 30.
-        appointment_type: Appointment type, for example "in-store".
+        appointment_type: Appointment type, currently only "in-store" is supported.
         notes: Any additional notes about the appointment.
         syncToGoogle: Whether to sync to Google Calendar, default True.
     """
@@ -512,32 +509,32 @@ appointment_support_agent = Agent(
     disallow_transfer_to_peers=True,
 )
 
-# 4. FRONT DESK (Root Agent) - answers simple questions, transfers only when needed
+# 4. ORCHESTRATOR (Root Agent) - routing only, no direct answers
 patty_peck_assistant = Agent(
     name="patty_peck_assistant",
     model="gemini-2.5-flash",
     description=(
-        "Main Patty Peck Honda assistant. Answers general questions. Transfers to specialists "
-        "for product/inventory search and appointments when needed."
+        "Patty Peck Honda orchestrator. Routes user messages to the correct specialist agent "
+        "and never answers questions directly."
     ),
     instruction=(
-        "You are the Patty Peck Honda assistant.\n"
-        "Never say you're an agent and never mention internal routing/transfers.\n\n"
-        "If the user greets you, respond like: 'Hello, welcome to Patty Peck Honda — how can I help today?'\n\n"
-        "You can answer general questions directly (hours, location, directions, general help).\n"
-        "If a specialist is better suited, transfer to them.\n\n"
-        "Transfer guidance:\n"
-        "- Warranty questions → transfer to `faq_agent`\n"
-        "- Product/inventory search → transfer to `product_agent`\n"
-        "- Appointments (book/cancel/reschedule/search) → transfer to `appointment_support_agent`\n"
-        "- Everything else/general → you can answer directly\n\n"
-        "Global requirements (apply silently):\n"
-        "- Phone numbers: assume +1 if country code not provided\n"
-        "- Be time-aware in the user's timezone when relevant\n"
-        "- Be channel-aware (Web Chat, SMS, Voice, WhatsApp)\n"
-        "- Never re-ask for info already collected; confirm & reuse"
+        "You are the Patty Peck Honda orchestrator.\n"
+        "Your ONLY job is to decide which specialist agent should handle the user's message.\n"
+        "You MUST NOT answer the user directly or generate any natural language text.\n\n"
+        "On every user message:\n"
+        "- Immediately call `transfer_to_agent` and output NOTHING else.\n"
+        "- Do NOT say hello, explain routing, or echo the user's question.\n\n"
+        "Routing rules:\n"
+        "- General questions about Patty Peck Honda (hours, location, directions, service, finance, warranty, recalls, trade‑in, support) → transfer to `faq_agent`.\n"
+        "- Any product/vehicle/inventory search (colors, trims, models, 'show me', 'what cars', 'SUV', 'truck', etc.) → transfer to `product_agent`.\n"
+        "- Anything about booking, changing, or canceling appointments, or when a user explicitly wants to talk to a human or needs help beyond chat → transfer to `appointment_support_agent`.\n"
+        "- If you are unsure, default to `faq_agent`.\n\n"
+        "Important:\n"
+        "- Never compose a reply to the user yourself.\n"
+        "- Never summarize or restate what the specialists will do.\n"
+        "- Only use `transfer_to_agent` with one of: `faq_agent`, `product_agent`, or `appointment_support_agent`."
     ),
-    tools=[send_sms, notify_team],
+    tools=[],  # No direct tools; only routes via transfer_to_agent to sub_agents
     # Specialists available for transfer.
     sub_agents=[
         faq_agent,
