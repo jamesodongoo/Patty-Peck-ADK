@@ -568,7 +568,7 @@ When you’re looking for an auto loan in the Jackson area, our Honda dealer can
 Whether you wish to buy or lease, you can count on the finance specialists at Patty Peck Honda. Stop by our dealership today. or call us at 601-957-3400 to talk to our team about any questions you may have about our car payment calculator and current special offers. We’ll be happy to help! We’re conveniently located in Ridgeland, just a short drive from Jackson, Brandon, Madison, and Flowood, so come see us today!
 
 Payment calculator tool link: https://www.pattypeckhonda.com/payment-calculator/
-"""
+""",
         "tools": ["create_ticket", "create_appointment"]
     }
 ]
@@ -760,6 +760,51 @@ async def create_appointment(
         return {"result": f"Appointment booking failed due to a temporary error. Please try again."}
 
 
+async def show_directions() -> dict:
+    """Get directions to Patty Peck Honda dealership. Returns address and Google Maps link."""
+    address = "555 Sunnybrook Road, Ridgeland, MS 39157"
+    maps_url = "https://www.google.com/maps/dir/?api=1&destination=555+Sunnybrook+Road,+Ridgeland,+MS+39157"
+    return {
+        "result": f"Patty Peck Honda is located at {address}. Get directions: {maps_url}",
+        "address": address,
+        "maps_url": maps_url
+    }
+
+
+async def connect_to_support(
+    customerName: str = "",
+    customerEmail: str = "",
+    customerPhone: str = "",
+    reason: str = ""
+) -> dict:
+    """Connect customer to human support team. Returns confirmation message.
+    
+    Args:
+        customerName: Full name of the customer
+        customerEmail: Email address of the customer
+        customerPhone: Phone number of the customer
+        reason: Reason for connecting to support
+    """
+    # This would typically call an API to notify support team
+    # For now, return a confirmation message
+    return {
+        "result": f"Connecting {customerName} to support team. They will be contacted at {customerEmail} or {customerPhone}."
+    }
+
+
+async def car_information(query: str) -> dict:
+    """Get car information, research, or trim comparison documents.
+    
+    Args:
+        query: The car information query (e.g., "2024 Accord Trim Comparison", "2023 CR-V Research")
+    """
+    # This would typically query a knowledge base or RAG system
+    # For now, return a placeholder response
+    return {
+        "result": f"Car information for '{query}' is not available at this time. Please contact the dealership for detailed specifications."
+    }
+
+
 
 TOOL_MAP = {
     "search_products": FunctionTool(search_products),
@@ -767,6 +812,7 @@ TOOL_MAP = {
     "create_appointment": FunctionTool(create_appointment),
     "show_directions": FunctionTool(show_directions),
     "connect_to_support": FunctionTool(connect_to_support),
+    "car_information": FunctionTool(car_information),
 }
 
 
