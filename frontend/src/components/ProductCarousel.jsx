@@ -8,7 +8,7 @@ function ProductCard({ product }) {
   const imageUrl = product.image_url || product.imageUrl
   const hasImage = imageUrl && !imageUrl.includes('no_selection')
   const [imgError, setImgError] = useState(false)
-  
+
   return (
     <div className="product-card">
       {hasImage && !imgError ? (

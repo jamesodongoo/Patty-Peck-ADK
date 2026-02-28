@@ -70,10 +70,10 @@ export function ChatMessage({ message }) {
       {/* Message Content */}
       <div className="message-body">
         <div className={`message-bubble ${isUser ? 'bubble-user' : isSystem ? 'bubble-system' : 'bubble-agent'}`}>
-          {/* Only show text if there are no products */}
-          {!hasProducts && <MessageContent text={message.text} />}
+          {/* Always show AI text (may include color/features summary) */}
+          <MessageContent text={message.text} />
 
-          {/* Products carousel - replaces text */}
+          {/* Products carousel - shown below text when products exist */}
           {hasProducts && (
             <ProductCarousel products={message.products} />
           )}

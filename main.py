@@ -212,6 +212,56 @@ def debug_multi_agent():
     }
 
 
+@app.get("/debug/product-search", include_in_schema=False)
+async def debug_product_search(query: str = "Honda Accord"):
+    """
+    Test raw n8n product search response - inspect what fields n8n returns.
+    Use this to verify field names (color, features, description) for your n8n workflow.
+    Usage: GET /debug/product-search?query=red+Accord
+    """
+    import httpx
+    import os
+    url = os.environ.get("PRODUCT_SEARCH_WEBHOOK_URL", "")
+    if not url:
+        return {"error": "PRODUCT_SEARCH_WEBHOOK_URL not set"}
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(url, json={
+                "User_message": query,
+                "chat_history": "na",
+                "Contact_ID": "na",
+                "customer_email": "na"
+            })
+        if resp.status_code != 200:
+            return {"error": f"n8n returned {resp.status_code}", "body_preview": resp.text[:500]}
+        data = resp.json()
+        # Show raw structure and first product keys for debugging
+        products = []
+        if isinstance(data, list) and len(data) > 0:
+            msg = data[0].get("message", "")
+            if isinstance(msg, str):
+                import json
+                try:
+                    parsed = json.loads(msg)
+                    products = parsed.get("products", [])
+                except Exception:
+                    products = data[0].get("products", [])
+            else:
+                products = data[0].get("products", [])
+        elif isinstance(data, dict):
+            products = data.get("products", [])
+        first_product_keys = list(products[0].keys()) if products else []
+        return {
+            "status": resp.status_code,
+            "product_count": len(products),
+            "first_product_keys": first_product_keys,
+            "first_product_sample": products[0] if products else None,
+            "raw_structure": "list" if isinstance(data, list) else "dict",
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+
 @app.get("/debug/bootstrap-retry", include_in_schema=False)
 async def debug_bootstrap_retry():
     """Manually retry the multi-agent bootstrap and return error details."""
